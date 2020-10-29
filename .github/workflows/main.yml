@@ -18,10 +18,6 @@ jobs:
         sudo apt -y install build-essential tree
         sudo cpan install Module::Build
 
-    - name: InstallDataTableText
-      run: |
-        sudo cpan install Data::Table::Text
-
 
 
     - name: Test
