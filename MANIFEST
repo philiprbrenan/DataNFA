@@ -2,9 +2,6 @@ Build.PL
 CHANGES
 CONTRIBUTING
 lib/Data/NFA.pm
-lib/Data/backups/NFA2.pm
-lib/Data/backups/NFA3.pm
-lib/Data/backups/NFA4.pm
 MANIFEST
 README
 README.md
