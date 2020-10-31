@@ -510,7 +510,7 @@ END
 Non deterministic finite state machine from regular expression.
 
 
-Version 20200621.
+Version 20201031.
 
 
 The following sections describe the methods in each functional area of this
@@ -532,7 +532,9 @@ One element. An element can also be represented by a string or number
 B<Example:>
 
 
-    my $nfa = fromExpr(𝗲𝗹𝗲𝗺𝗲𝗻𝘁("a"));
+  
+    my $nfa = fromExpr(element("a"));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $nfa->print("Element: a") eq <<END;
   Element: a
   Location  F  Transitions  Jumps
@@ -546,7 +548,7 @@ B<Example:>
     ok !$nfa->parse(qw(a b));
     ok !$nfa->parse(qw(b));
     ok !$nfa->parse(qw(b a));
-
+  
 
 This is a static method and so should either be imported or invoked as:
 
@@ -578,7 +580,7 @@ B<Example:>
     ok !$nfa->parse(qw(b a));
     ok !$nfa->parse(qw(a));
     ok !$nfa->parse(qw(b));
-
+  
 
 This is a static method and so should either be imported or invoked as:
 
@@ -595,7 +597,9 @@ An optional sequence of elements and/or symbols.
 B<Example:>
 
 
-    my $nfa = fromExpr("a", 𝗼𝗽𝘁𝗶𝗼𝗻𝗮𝗹("b"), "c");
+  
+    my $nfa = fromExpr("a", optional("b"), "c");  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     is_deeply $nfa->print("ab?c"), <<END;
   ab?c
   Location  F  Transitions  Jumps
@@ -612,7 +616,7 @@ B<Example:>
     ok  $nfa->parse(qw(a b c));
     ok  $nfa->parse(qw(a c));
     ok !$nfa->parse(qw(a c b));
-
+  
 
 This is a static method and so should either be imported or invoked as:
 
@@ -629,7 +633,9 @@ Zero or more repetitions of a sequence of elements and/or symbols.
 B<Example:>
 
 
-    my $nfa = fromExpr("a", 𝘇𝗲𝗿𝗼𝗢𝗿𝗠𝗼𝗿𝗲("b"), "c");
+  
+    my $nfa = fromExpr("a", zeroOrMore("b"), "c");  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     is_deeply $nfa->print("ab*c"), <<END;
   ab*c
   Location  F  Transitions  Jumps
@@ -647,9 +653,11 @@ B<Example:>
     ok  $nfa->parse(qw(a b c));
     ok  $nfa->parse(qw(a b b c));
     ok !$nfa->parse(qw(a b b d));
-
+  
     my $nfa = fromExpr("a",
-                       𝘇𝗲𝗿𝗼𝗢𝗿𝗠𝗼𝗿𝗲(choice("a",
+  
+                       zeroOrMore(choice("a",  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
                        "a")),
                        "a");
     is_deeply $nfa->print("(a(a|a)*a"), <<END;
@@ -669,12 +677,12 @@ B<Example:>
         11     { a => 12 }  undef
         12  1  undef        undef
   END
-
+  
     ok !$nfa->parse(qw(a));
     ok  $nfa->parse(qw(a a));
     ok  $nfa->parse(qw(a a a));
     ok !$nfa->parse(qw(a b a));
-
+  
 
 This is a static method and so should either be imported or invoked as:
 
@@ -691,8 +699,10 @@ One or more repetitions of a sequence of elements and/or symbols.
 B<Example:>
 
 
-    my $nfa = fromExpr("a", 𝗼𝗻𝗲𝗢𝗿𝗠𝗼𝗿𝗲("b"), "c");
+  
+    my $nfa = fromExpr("a", oneOrMore("b"), "c");  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+  
     is_deeply $nfa->print("One or More: ab+c"), <<END;
   One or More: ab+c
   Location  F  Transitions  Jumps
@@ -706,12 +716,12 @@ B<Example:>
          7     { c => 8 }   undef
          8  1  undef        undef
   END
-
+  
     ok !$nfa->parse(qw(a c));
     ok  $nfa->parse(qw(a b c));
     ok  $nfa->parse(qw(a b b c));
     ok !$nfa->parse(qw(a b b d));
-
+  
 
 This is a static method and so should either be imported or invoked as:
 
@@ -729,7 +739,9 @@ B<Example:>
 
 
     my $nfa = fromExpr("a",
-                       𝗰𝗵𝗼𝗶𝗰𝗲(qw(b c)),
+  
+                       choice(qw(b c)),  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
                        "d");
     is_deeply $nfa->print("(a(b|c)d"), <<END;
   (a(b|c)d
@@ -746,11 +758,11 @@ B<Example:>
          9     { d => 10 }  undef
         10  1  undef        undef
   END
-
+  
     ok  $nfa->parse(qw(a b d));
     ok  $nfa->parse(qw(a c d));
     ok !$nfa->parse(qw(a b c d));
-
+  
 
 This is a static method and so should either be imported or invoked as:
 
@@ -767,8 +779,10 @@ Choice from amongst all symbols except the ones mentioned
 B<Example:>
 
 
-    my $nfa = fromExpr(choice(qw(a b c)), 𝗲𝘅𝗰𝗲𝗽𝘁(qw(c x)), choice(qw(a b c)));
+  
+    my $nfa = fromExpr(choice(qw(a b c)), except(qw(c x)), choice(qw(a b c)));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+  
     is_deeply $nfa->print("(a|b|c)(c!x)(a|b|c)"), <<END;
   (a|b|c)(c!x)(a|b|c)
   Location  F  Transitions  Jumps
@@ -798,11 +812,11 @@ B<Example:>
         23     { c => 24 }  undef
         24  1  undef        undef
   END
-
+  
     ok !$nfa->parse(qw(a a));
     ok  $nfa->parse(qw(a a a));
     ok !$nfa->parse(qw(a c a));
-
+  
 
 This is a static method and so should either be imported or invoked as:
 
@@ -823,13 +837,15 @@ Create an NFA from a regular B<@expression>.
 B<Example:>
 
 
-    my $nfa = 𝗳𝗿𝗼𝗺𝗘𝘅𝗽𝗿
+  
+    my $nfa = fromExpr  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      ("a",
       oneOrMore(choice(qw(b c))),
       optional("d"),
       element("e")
      );
-
+  
     is_deeply $nfa->print("a(b|c)+d?e"), <<END;
   a(b|c)+d?e
   Location  F  Transitions  Jumps
@@ -850,14 +866,14 @@ B<Example:>
         14     { e => 15 }  undef
         15  1  undef        undef
   END
-
+  
     is_deeply ['a'..'e'], [$nfa->symbols];
-
+  
     ok !$nfa->parse(qw(a e));
     ok !$nfa->parse(qw(a d e));
     ok  $nfa->parse(qw(a b c e));
     ok  $nfa->parse(qw(a b c d e));
-
+  
 
 This is a static method and so should either be imported or invoked as:
 
@@ -881,8 +897,10 @@ B<Example:>
       optional("d"),
       element("e")
      );
+  
+  
+    is_deeply $nfa->print("a(b|c)+d?e"), <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    is_deeply $nfa->𝗽𝗿𝗶𝗻𝘁("a(b|c)+d?e"), <<END;
   a(b|c)+d?e
   Location  F  Transitions  Jumps
          0     undef        [1]
@@ -902,14 +920,14 @@ B<Example:>
         14     { e => 15 }  undef
         15  1  undef        undef
   END
-
+  
     is_deeply ['a'..'e'], [$nfa->symbols];
-
+  
     ok !$nfa->parse(qw(a e));
     ok !$nfa->parse(qw(a d e));
     ok  $nfa->parse(qw(a b c e));
     ok  $nfa->parse(qw(a b c d e));
-
+  
 
 =head2 symbols($states)
 
@@ -927,7 +945,7 @@ B<Example:>
       optional("d"),
       element("e")
      );
-
+  
     is_deeply $nfa->print("a(b|c)+d?e"), <<END;
   a(b|c)+d?e
   Location  F  Transitions  Jumps
@@ -948,14 +966,16 @@ B<Example:>
         14     { e => 15 }  undef
         15  1  undef        undef
   END
+  
+  
+    is_deeply ['a'..'e'], [$nfa->symbols];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    is_deeply ['a'..'e'], [$nfa->𝘀𝘆𝗺𝗯𝗼𝗹𝘀];
-
+  
     ok !$nfa->parse(qw(a e));
     ok !$nfa->parse(qw(a d e));
     ok  $nfa->parse(qw(a b c e));
     ok  $nfa->parse(qw(a b c d e));
-
+  
 
 =head2 isFinal($states, $state)
 
@@ -976,13 +996,17 @@ B<Example:>
          1     { a => 2 }   undef
          2  1  undef        undef\
   END
-    ok  $nfa->𝗶𝘀𝗙𝗶𝗻𝗮𝗹(2);
-    ok !$nfa->𝗶𝘀𝗙𝗶𝗻𝗮𝗹(0);
+  
+    ok  $nfa->isFinal(2);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok !$nfa->isFinal(0);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok  $nfa->parse(qw(a));
     ok !$nfa->parse(qw(a b));
     ok !$nfa->parse(qw(b));
     ok !$nfa->parse(qw(b a));
-
+  
 
 =head2 allTransitions($states)
 
@@ -995,9 +1019,9 @@ B<Example:>
 
 
     my $s = q(zeroOrMore(choice("a")));
-
+  
     my $nfa = eval qq(fromExpr(sequence($s,$s)));
-
+  
     is_deeply $nfa->print("a*"), <<END;
   a*
   Location  F  Transitions  Jumps
@@ -1014,7 +1038,7 @@ B<Example:>
         10  1  undef        [7, 8, 9, 11]
         11  1  undef        undef
   END
-
+  
     ok  $nfa->parse(qw());
     ok  $nfa->parse(qw(a));
     ok !$nfa->parse(qw(b));
@@ -1023,8 +1047,10 @@ B<Example:>
     ok !$nfa->parse(qw(a b));
     ok !$nfa->parse(qw(b a));
     ok !$nfa->parse(qw(c));
+  
+  
+    is_deeply $nfa->allTransitions, {  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    is_deeply $nfa->𝗮𝗹𝗹𝗧𝗿𝗮𝗻𝘀𝗶𝘁𝗶𝗼𝗻𝘀, {
     "0"  => { a => [10, 11, 2 .. 9] },
     "1"  => { a => [10, 11, 2 .. 9] },
     "2"  => { a => [10, 11, 2 .. 9] },
@@ -1038,7 +1064,7 @@ B<Example:>
     "10" => { a => [10, 11, 7, 8, 9] },
     "11" => { a => [] },
   };
-
+  
     is_deeply $nfa->print("a*a* 2"), <<END;
   a*a* 2
   Location  F  Transitions  Jumps
@@ -1055,7 +1081,7 @@ B<Example:>
         10  1  undef        [7, 8, 9, 11]
         11  1  undef        undef
   END
-
+  
 
 =head2 parse($states, @symbols)
 
@@ -1078,11 +1104,19 @@ B<Example:>
   END
     ok  $nfa->isFinal(2);
     ok !$nfa->isFinal(0);
-    ok  $nfa->𝗽𝗮𝗿𝘀𝗲(qw(a));
-    ok !$nfa->𝗽𝗮𝗿𝘀𝗲(qw(a b));
-    ok !$nfa->𝗽𝗮𝗿𝘀𝗲(qw(b));
-    ok !$nfa->𝗽𝗮𝗿𝘀𝗲(qw(b a));
+  
+    ok  $nfa->parse(qw(a));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+  
+    ok !$nfa->parse(qw(a b));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok !$nfa->parse(qw(b));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok !$nfa->parse(qw(b a));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
 
 
 =head2 Data::NFA::State Definition
@@ -1096,11 +1130,17 @@ NFA State
 =head3 Output fields
 
 
-B<final> - Whether this state is final
+=head4 final
 
-B<jumps> - {to     => 1}     : jumps from this state not consuming any input symbols
+Whether this state is final
 
-B<transitions> - {symbol => state} : transitions from this state consuming one input symbol
+=head4 jumps
+
+{to     => 1}     : jumps from this state not consuming any input symbols
+
+=head4 transitions
+
+{symbol => state} : transitions from this state consuming one input symbol
 
 
 
